@@ -1,192 +1,125 @@
-VAX-PLM — Digital Regulatory Twin (VAX-HIV-2030)
-Overview
+# VAX-PLM — Digital Regulatory Twin (VAX-HIV-2030)
 
-VAX-PLM is an interactive digital regulatory twin designed to model the complete Product Lifecycle Management (PLM) flow of a fictional vaccine: VAX-HIV-2030.
+## Overview
+VAX-PLM is an interactive digital regulatory twin designed to model the complete Product Lifecycle Management (PLM) flow of a fictional vaccine: **VAX-HIV-2030**.
 
-The application centralizes all regulatory components—requirements, documents, evidence, quality, IoT monitoring, lifecycle, audit trail, and submission—to provide a unified and traceable view of regulatory compliance aligned with EMA and ANSM expectations.
+The application centralizes all regulatory components — requirements, documents, evidence, quality, IoT monitoring, lifecycle, audit trail, and submission — to provide a unified and traceable view of regulatory compliance aligned with EMA and ANSM expectations.
 
-This project illustrates how a regulatory ecosystem can be organized, visualized, and navigated using a modern data application.
+This project illustrates how a full regulatory ecosystem can be organized, visualized, and navigated using a modern data application.
 
-Objectives
+---
 
-Model a realistic regulatory workflow used in vaccine development.
+## Objectives
 
-Provide end-to-end traceability between:
+- Model a realistic regulatory workflow used in vaccine development  
+- Provide end-to-end traceability between:  
+  - Requirements  
+  - Documents  
+  - Evidence  
+- Deliver a multi-view dashboard covering:  
+  - Quality and GMP aspects  
+  - Cold chain and IoT monitoring  
+  - Lifecycle stages (R&D to pharmacovigilance)  
+  - Archiving and audit trail  
+  - Regulatory submission pathways  
+- Allow CSV import and automatic relational fusion using PLM-style mappings  
+- Present an intuitive UX suitable for training and demonstration  
 
-Requirements
+---
 
-Documents
+## Main Features
 
-Evidence
-
-Deliver a multi-view dashboard covering:
-
-Quality and GMP aspects
-
-Cold chain and IoT monitoring
-
-Lifecycle stages (R&D to pharmacovigilance)
-
-Archiving and audit trail
-
-Regulatory submission pathways
-
-Allow CSV import and automatic relational fusion using PLM-style mappings.
-
-Present an intuitive, structured UX suitable for training and demonstration.
-
-Main Features
-1. Requirements – Documents – Evidence Mapping
-
+### 1. Requirements – Documents – Evidence Mapping
 Users can upload CSV files and automatically visualize the connections between:
-
-Requirement and its associated document
-
-Document and its evidence
-
-Requirement and its evidence
+- Requirement ↔ Document  
+- Document ↔ Evidence  
+- Requirement ↔ Evidence  
 
 The system merges and standardizes datasets to rebuild traceability matrices used in real validation dossiers.
 
-2. Multi-Page Interactive Application
+---
 
-The application is organized into dedicated modules, each representing a key regulatory activity:
+### 2. Multi-Page Interactive Application
+The application is structured into dedicated modules, each representing a key regulatory activity:
 
-Requirements
+- Requirements  
+- Documents  
+- Evidence  
+- Regulatory Dashboard  
+- Quality Control  
+- IoT Monitoring  
+- Lifecycle Management  
+- Regulatory Submission  
+- Secure Archiving  
+- Audit Trail  
 
-Documents
+---
 
-Evidence
-
-Regulatory Dashboard
-
-Quality Control
-
-IoT Monitoring (cold chain)
-
-Lifecycle Management
-
-Regulatory Submission
-
-Secure Archiving
-
-Audit Trail
-
-3. Pharmaceutical Lifecycle Modeling
-
+### 3. Pharmaceutical Lifecycle Modeling
 A complete lifecycle representation is included:
 
-Fundamental Research
+1. Fundamental Research  
+2. Preclinical Development  
+3. Clinical Development (Phases I–III)  
+4. Industrial Production (GMP)  
+5. Marketing Authorization Application  
+6. Commercialization and Distribution  
+7. Pharmacovigilance and Post-Market Surveillance  
 
-Preclinical Development
+---
 
-Clinical Development (Phases I–III)
+### 4. IoT Monitoring (Cold Chain)
+Simulates temperature monitoring (fridges, freezers, labs, transport) to illustrate:
+- chain-of-custody  
+- temperature excursions  
+- stability  
+- quality risk assessment  
 
-Industrial Production (GMP)
+---
 
-Marketing Authorization Application
+### 5. Regulatory Submission Simulation
+Summarizes the key deliverables required for EMA/ANSM submissions, including:
+- validation packages  
+- consistency checks  
+- data completeness  
+- documentation structure  
 
-Commercialization and Distribution
+---
 
-Pharmacovigilance and Post-Market Surveillance
+## Project Structure
 
-4. IoT Monitoring (Temperature / Cold Chain)
-
-Simulates monitoring of temperature data for fridges, freezers, laboratories, and transport.
-Useful to illustrate chain-of-custody, temperature excursions, stability and quality risk assessment.
-
-5. Regulatory Submission Simulation
-
-Summarizes the key deliverables and data packages required for EMA or ANSM submission, including validation, consistency, and completeness checks.
-
-Project Structure
 Pages/
-  Documents.py
-  Evidence.py
-  IoT_Monitor.py
-  Lifecycle_Management.py
-  Quality_Control.py
-  Regulatory_Dashboard.py
-  Regulatory_Submission.py
-  Requirements.py
+Documents.py
+Evidence.py
+IoT_Monitor.py
+Lifecycle_Management.py
+Quality_Control.py
+Regulatory_Dashboard.py
+Regulatory_Submission.py
+Requirements.py
 
 streamlit_app.py
 dataset.py
 requirements.txt
 README.md
 
-streamlit_app.py
 
-Main entry point. Handles dataset import, initial layout, navigation, and fusion logic.
+---
 
-Pages/*.py
+## Technology Stack
 
-Each file corresponds to a regulatory domain or dashboard section.
+- Python 3  
+- Streamlit  
+- Pandas  
+- Plotly / Matplotlib  
+- CSV datasets  
+- GitHub Codespaces  
+- Streamlit Cloud  
 
-Technology Stack
+---
 
-Python 3
+## Running Locally
 
-Streamlit
-
-Pandas
-
-Plotly or Matplotlib (depending on the page)
-
-CSV datasets
-
-GitHub Codespaces
-
-Streamlit Cloud for deployment
-
-Running Locally
+```bash
 pip install -r requirements.txt
 streamlit run streamlit_app.py
-
-Deployment
-
-The application is deployed on Streamlit Cloud.
-Once deployed, the public link should be added here:
-
-<Insert your Streamlit Cloud URL here>
-
-Value of the Project
-
-This project demonstrates:
-
-Understanding of pharmaceutical regulatory workflows
-
-Ability to structure a PLM-like regulatory system
-
-Development of a multi-page web dashboard
-
-Data cleaning, merging and traceability reconstruction
-
-Cold chain and quality monitoring concepts
-
-Code organization and documentation
-
-Deployment using Streamlit Cloud
-
-It is a strong example of how data, software, and regulatory knowledge can be combined into a realistic and impactful demonstration project.
-
-Author
-
-Myriam Ait Said
-Data & AI — PLM / Regulatory Systems
-
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://blank-app-template.streamlit.app/)
-
-### How to run it on your own machine
-
-1. Install the requirements
-
-   ```
-   $ pip install -r requirements.txt
-   ```
-
-2. Run the app
-
-   ```
-   $ streamlit run streamlit_app.py
-   ```
