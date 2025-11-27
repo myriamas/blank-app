@@ -55,7 +55,8 @@ def color_statut(val: str) -> str:
 
 def go_to(target: str) -> None:
     st.session_state["page"] = target
-    st.experimental_rerun()
+    st.rerun()
+
 
 
 # ----- Sidebar navigation -----
