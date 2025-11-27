@@ -16,7 +16,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ----- Session state for navigation (so buttons can change pages) -----
+# ----- Pages list -----
 PAGES = [
     "Accueil",
     "Vue d'ensemble",
@@ -34,11 +34,15 @@ PAGES = [
     "Soumission réglementaire",
 ]
 
+# ----- Session state init -----
 if "page" not in st.session_state:
     st.session_state["page"] = "Accueil"
 
+if "selected_requirement" not in st.session_state:
+    st.session_state["selected_requirement"] = None
 
-# ----- Helper for status coloring -----
+
+# ----- Helpers -----
 def color_statut(val: str) -> str:
     if val == "Conforme":
         return "background-color: #C8F7C5"
@@ -47,6 +51,11 @@ def color_statut(val: str) -> str:
     if val == "Non conforme":
         return "background-color: #F5B7B1"
     return ""
+
+
+def go_to(target: str) -> None:
+    st.session_state["page"] = target
+    st.experimental_rerun()
 
 
 # ----- Sidebar navigation -----
@@ -59,72 +68,68 @@ sidebar_choice = st.sidebar.radio(
     index=PAGES.index(st.session_state["page"]),
 )
 
-# Sync sidebar choice with session state
 if sidebar_choice != st.session_state["page"]:
     st.session_state["page"] = sidebar_choice
 
 page = st.session_state["page"]
 
 
-# ----- Small helper to go to a page from buttons -----
-def go_to(target: str) -> None:
-    st.session_state["page"] = target
-    st.rerun()
-
-
-# ----- ACCUEIL -----
+# ===========================
+# ACCUEIL
+# ===========================
 if page == "Accueil":
     st.title("VAX-PLM – Jumeau Réglementaire du vaccin VIH")
 
     st.markdown(
         """
-        Cette application présente le **jumeau réglementaire** du vaccin fictif VAX-HIV-2030.
-        Je regroupe ici toutes les briques du projet : exigences, documents, preuves, qualité,
-        IoT, archivage, cycle de vie et soumission EMA/ANSM.
+        Cette application rassemble l'ensemble du travail sur le vaccin fictif **VAX-HIV-2030** :
+        exigences, documents, preuves, qualité, IoT, archivage, cycle de vie et soumission EMA/ANSM.
         """
     )
 
-    st.markdown("### Par où je commence ?")
+    st.markdown("### Points d'entrée principaux")
 
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        st.markdown("####  Vue globale")
-        st.write("Etat de conformité des exigences (vert / orange / rouge).")
-        if st.button("Aller à la vue d'ensemble", use_container_width=True):
+        st.subheader("Vue globale")
+        st.write("Etat de conformité des exigences et filtres par phase / type d'exigence.")
+        if st.button("Ouvrir la vue d'ensemble", use_container_width=True):
             go_to("Vue d'ensemble")
 
-        st.markdown("####  Exigence → Doc → Preuves")
-        st.write("Je choisis une exigence et je vois tous les liens PLM associés.")
-        if st.button("Aller à l'exigence détaillée", use_container_width=True):
+        st.subheader("Lien Exigence → PLM")
+        st.write("Fiche détaillée qui relie une exigence à ses documents, preuves, IoT, certificats.")
+        if st.button("Ouvrir l'exigence détaillée", use_container_width=True):
             go_to("Exigence détaillée")
 
     with col2:
-        st.markdown("####  Qualité & chaîne du froid")
-        st.write("Stérilité, stabilité 2–8°C, validation analytique.")
-        if st.button("Voir la vue Qualité", use_container_width=True):
+        st.subheader("Qualité")
+        st.write("Stérilité, stabilité 2–8°C, validation analytique des tests VIH.")
+        if st.button("Ouvrir la vue Qualité", use_container_width=True):
             go_to("Qualité")
 
-        st.markdown("####  IoT / Température")
-        st.write("Exemple de relevés température pour frigos et salles.")
-        if st.button("Voir la vue IoT / Température", use_container_width=True):
+        st.subheader("IoT / Température")
+        st.write("Exemple de relevés température pour frigos et zones contrôlées.")
+        if st.button("Ouvrir la vue IoT / Température", use_container_width=True):
             go_to("IoT / Température")
 
     with col3:
-        st.markdown("####  Cycle de vie & RFLP")
-        st.write("Du concept jusqu'à la pharmacovigilance + vue RFLP du projet.")
-        if st.button("Voir le cycle de vie", use_container_width=True):
+        st.subheader("Cycle de vie et RFLP")
+        st.write("Vue du cycle de vie complet et synthèse Sécurité / Qualité / Efficacité / Production.")
+        if st.button("Ouvrir le cycle de vie", use_container_width=True):
             go_to("Cycle de vie")
-        if st.button("Voir la vue RFLP / Architecture", use_container_width=True):
+        if st.button("Ouvrir la vue RFLP / Architecture", use_container_width=True):
             go_to("RFLP / Architecture")
 
-        st.markdown("####  Archivage & audit")
-        st.write("Politique d'archivage 25 ans et exemple d'audit trail.")
-        if st.button("Archivage sécurisé", use_container_width=True):
+        st.subheader("Archivage et audit")
+        st.write("Politique d'archivage 25 ans et exemple de change control / audit trail.")
+        if st.button("Ouvrir l'archivage sécurisé", use_container_width=True):
             go_to("Archivage sécurisé")
 
 
-# ----- VUE D'ENSEMBLE -----
+# ===========================
+# VUE D'ENSEMBLE
+# ===========================
 elif page == "Vue d'ensemble":
     st.title("Vue d'ensemble des exigences réglementaires")
 
@@ -147,18 +152,37 @@ elif page == "Vue d'ensemble":
         st.markdown("**Nombre d'exigences affichées :** " + str(len(df)))
 
     with col_table:
-        df_view = df[
-            ["Nom", "Phase", "Type_exigence", "Impact_AMM", "Statut"]
-        ].reset_index(drop=True)
-        styled = df_view.style.applymap(color_statut, subset=["Statut"]).hide(axis="index")
-        st.dataframe(styled, use_container_width=True)
+        df_view = df[["Nom", "Phase", "Type_exigence", "Impact_AMM", "Statut"]].reset_index(drop=True)
+        styled = df_view.style.applymap(color_statut, subset=["Statut"])
+        st.dataframe(styled, use_container_width=True, hide_index=True)
+
+    # Navigation vers fiche détaillée à partir de la vue d'ensemble
+    st.markdown("### Explorer une exigence en détail")
+    if len(df) > 0:
+        nom_sel = st.selectbox(
+            "Je sélectionne une exigence à détailler :", df_view["Nom"].tolist()
+        )
+        if st.button("Ouvrir la fiche détaillée depuis la vue d'ensemble"):
+            st.session_state["selected_requirement"] = nom_sel
+            go_to("Exigence détaillée")
 
 
-# ----- EXIGENCE DETAILLEE -----
+# ===========================
+# EXIGENCE DETAILLEE
+# ===========================
 elif page == "Exigence détaillée":
     st.title("Exigence détaillée – Exigence → Documents → Preuves")
 
-    choix = st.selectbox("Je sélectionne une exigence :", df_master["Nom"].tolist())
+    options = df_master["Nom"].tolist()
+    if st.session_state["selected_requirement"] in options:
+        default_index = options.index(st.session_state["selected_requirement"])
+    else:
+        default_index = 0
+
+    choix = st.selectbox(
+        "Je sélectionne une exigence :", options, index=default_index
+    )
+    st.session_state["selected_requirement"] = choix
 
     ligne = df_master[df_master["Nom"] == choix].iloc[0]
 
@@ -186,7 +210,9 @@ elif page == "Exigence détaillée":
         st.write(f"**Référence de fiche / protocole :** {ligne['Fiche_protocole']}")
 
 
-# ----- TABLEAU DES EXIGENCES -----
+# ===========================
+# TABLEAU DES EXIGENCES
+# ===========================
 elif page == "Tableau des exigences":
     st.title("Tableau complet des exigences")
 
@@ -202,10 +228,20 @@ elif page == "Tableau des exigences":
         ]
     ].reset_index(drop=True)
 
-    st.dataframe(df_view, use_container_width=True)
+    st.dataframe(df_view, use_container_width=True, hide_index=True)
+
+    # lien vers fiche détaillée
+    nom_sel = st.selectbox(
+        "Voir la fiche détaillée d'une exigence :", df_view["Nom"].tolist()
+    )
+    if st.button("Ouvrir la fiche détaillée depuis le tableau des exigences"):
+        st.session_state["selected_requirement"] = nom_sel
+        go_to("Exigence détaillée")
 
 
-# ----- DOCUMENTS -----
+# ===========================
+# DOCUMENTS
+# ===========================
 elif page == "Documents":
     st.title("Documents liés aux exigences")
 
@@ -213,10 +249,19 @@ elif page == "Documents":
         ["Nom", "Documents_lies", "Fiche_protocole", "Phase", "Type_exigence", "Statut"]
     ].reset_index(drop=True)
 
-    st.dataframe(docs, use_container_width=True)
+    st.dataframe(docs, use_container_width=True, hide_index=True)
+
+    nom_sel = st.selectbox(
+        "Voir la fiche détaillée à partir d'un document :", docs["Nom"].tolist()
+    )
+    if st.button("Ouvrir la fiche détaillée depuis Documents"):
+        st.session_state["selected_requirement"] = nom_sel
+        go_to("Exigence détaillée")
 
 
-# ----- PREUVES -----
+# ===========================
+# PREUVES
+# ===========================
 elif page == "Preuves":
     st.title("Preuves associées aux exigences")
 
@@ -224,30 +269,57 @@ elif page == "Preuves":
         ["Nom", "Preuves_liees", "Impact_AMM", "Type_exigence", "Phase", "Statut"]
     ].reset_index(drop=True)
 
-    st.dataframe(evid, use_container_width=True)
+    st.dataframe(evid, use_container_width=True, hide_index=True)
+
+    nom_sel = st.selectbox(
+        "Voir la fiche détaillée à partir d'une preuve :", evid["Nom"].tolist()
+    )
+    if st.button("Ouvrir la fiche détaillée depuis Preuves"):
+        st.session_state["selected_requirement"] = nom_sel
+        go_to("Exigence détaillée")
 
 
-# ----- QUALITE -----
+# ===========================
+# QUALITE
+# ===========================
 elif page == "Qualité":
     st.title("Vue Qualité (stérilité, stabilité, méthodes analytiques)")
 
     quality = df_master[df_master["Type_exigence"] == "Qualité"].copy()
-    df_view = quality[
-        [
-            "Nom",
-            "Description",
-            "Phase",
-            "Statut",
-            "Impact_AMM",
-            "Process_qualite",
-            "Certificat_etalonnage",
-        ]
+
+    # tableau synthétique sans scroll horizontal
+    df_summary = quality[
+        ["Nom", "Phase", "Statut", "Process_qualite"]
     ].reset_index(drop=True)
+    st.subheader("Synthèse Qualité")
+    st.dataframe(df_summary, use_container_width=True, hide_index=True)
 
-    st.dataframe(df_view, use_container_width=True)
+    # tous les détails dans un expander
+    with st.expander("Afficher le détail complet Qualité (toutes les colonnes)"):
+        df_full = quality[
+            [
+                "Nom",
+                "Description",
+                "Phase",
+                "Statut",
+                "Impact_AMM",
+                "Process_qualite",
+                "Certificat_etalonnage",
+            ]
+        ].reset_index(drop=True)
+        st.dataframe(df_full, use_container_width=True, hide_index=True)
+
+    nom_sel = st.selectbox(
+        "Voir la fiche détaillée d'une exigence qualité :", df_summary["Nom"].tolist()
+    )
+    if st.button("Ouvrir la fiche détaillée depuis Qualité"):
+        st.session_state["selected_requirement"] = nom_sel
+        go_to("Exigence détaillée")
 
 
-# ----- IOT / TEMPERATURE -----
+# ===========================
+# IOT / TEMPERATURE
+# ===========================
 elif page == "IoT / Température":
     st.title("IoT / Température – chaîne du froid et salles contrôlées")
 
@@ -260,36 +332,42 @@ elif page == "IoT / Température":
     }
 
     df_iot = pd.DataFrame(data_iot).reset_index(drop=True)
-    st.dataframe(df_iot, use_container_width=True)
+    st.dataframe(df_iot, use_container_width=True, hide_index=True)
 
 
-# ----- CYCLE DE VIE -----
+# ===========================
+# CYCLE DE VIE
+# ===========================
 elif page == "Cycle de vie":
     st.title("Cycle de vie du vaccin – VAX-HIV-2030")
 
-    st.dataframe(df_lifecycle.reset_index(drop=True), use_container_width=True)
+    st.dataframe(df_lifecycle.reset_index(drop=True), use_container_width=True, hide_index=True)
 
 
-# ----- RFLP / ARCHITECTURE -----
+# ===========================
+# RFLP / ARCHITECTURE
+# ===========================
 elif page == "RFLP / Architecture":
     st.title("Vue RFLP – Sécurité / Qualité / Efficacité / Production")
 
     st.subheader("Synthèse RFLP")
-    st.dataframe(df_rflp.reset_index(drop=True), use_container_width=True)
+    st.dataframe(df_rflp.reset_index(drop=True), use_container_width=True, hide_index=True)
 
     st.subheader("Architecture logique (vue simplifiée)")
     st.markdown(
         """
         1. Antigène / plateforme vaccinale  
         2. Formulation (vecteur, adjuvant)  
-        3. Administration (IM) et logistique  
+        3. Administration intramusculaire et logistique  
         4. Réponse immunitaire (humorale + cellulaire)  
         5. Contrôles qualité et libération des lots
         """
     )
 
 
-# ----- METHODOLOGIE IVV -----
+# ===========================
+# METHODOLOGIE IVV
+# ===========================
 elif page == "Méthodologie IVV":
     st.title("Méthodologie IVV – Intégration, Vérification, Validation")
 
@@ -305,11 +383,13 @@ elif page == "Méthodologie IVV":
     )
 
 
-# ----- ARCHIVAGE SECURISE -----
+# ===========================
+# ARCHIVAGE SECURISE
+# ===========================
 elif page == "Archivage sécurisé":
     st.title("Politique d'archivage sécurisé – VIH")
 
-    st.dataframe(df_archiving.reset_index(drop=True), use_container_width=True)
+    st.dataframe(df_archiving.reset_index(drop=True), use_container_width=True, hide_index=True)
 
     st.markdown(
         """
@@ -321,15 +401,23 @@ elif page == "Archivage sécurisé":
     )
 
 
-# ----- CHANGE CONTROL / AUDIT TRAIL -----
+# ===========================
+# CHANGE CONTROL / AUDIT TRAIL
+# ===========================
 elif page == "Change control / Audit trail":
     st.title("Change control et audit trail – exemple de scénario")
 
-    st.write("Exemple de changement réglementaire sur le vaccin VIH et son impact PLM.")
-    st.dataframe(df_audit_trail.reset_index(drop=True), use_container_width=True)
+    st.write("Exemple de changement réglementaire sur le vaccin VIH et impact sur le PLM.")
+    st.dataframe(
+        df_audit_trail.reset_index(drop=True),
+        use_container_width=True,
+        hide_index=True,
+    )
 
 
-# ----- SOUMISSION REGLEMENTAIRE -----
+# ===========================
+# SOUMISSION REGLEMENTAIRE
+# ===========================
 elif page == "Soumission réglementaire":
     st.title("Soumission réglementaire – EMA / ANSM")
 
